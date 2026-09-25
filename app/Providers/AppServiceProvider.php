@@ -6,6 +6,10 @@ use App\Repositories\Contracts\PropertyRepositoryInterface;
 use App\Repositories\PropertyRepository;
 use App\Services\Contracts\PropertyServiceInterface;
 use App\Services\PropertyService;
+use App\Repositories\Contracts\UserRepositoryInterface;
+use App\Repositories\UserRepository;
+use App\Services\Contracts\UserServiceInterface;
+use App\Services\UserService;
 use Illuminate\Support\ServiceProvider;
 use \App\Repositories\Contracts\CityRepositoryInterface;
 use \App\Repositories\CityRepository;
@@ -29,6 +33,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(CityServiceInterface::class, CityService::class);
         $this->app->bind(LocalityRepositoryInterface::class, LocalityRepository::class);
         $this->app->bind(LocalityServiceInterface::class, LocalityService::class);
+        $this->app->bind(UserRepositoryInterface::class, UserRepository::class);
+        $this->app->bind(UserServiceInterface::class, UserService::class);
     }
 
     /**

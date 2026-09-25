@@ -14,7 +14,8 @@ class PropertyController extends Controller
         protected PropertyServiceInterface $propertyService
     ) {}
 
-    public function index(Request $request){
+    public function index(Request $request)
+    {
         $filters = $request->only(['type', 'operation', 'min_price', 'max_price', 'locality_id', 'city_id']);
         $perPage = min(
             $request->integer('per_page', 15),
@@ -24,7 +25,8 @@ class PropertyController extends Controller
         return PropertyResource::collection($properties);
     }
 
-    public function show(int $id){
+    public function show(int $id)
+    {
         $property = $this->propertyService->find($id);
 
         if (!$property) {
@@ -34,12 +36,16 @@ class PropertyController extends Controller
         return new PropertyResource($property);
     }
 
-    public function store(StorePropertyRequest $request){
+    public function store(StorePropertyRequest $request)
+    {
         $property = $this->propertyService->store($request->validated());
-        return new PropertyResource($property)->response()->setStatusCode(201);
+        $resource = new PropertyResource($property);
+
+        return $resource->response()->setStatusCode(201);
     }
 
-    public function update(UpdatePropertyRequest $request, int $id){
+    public function update(UpdatePropertyRequest $request, int $id)
+    {
         $property = $this->propertyService->update($id, $request->validated());
 
         if (!$property) {
@@ -49,7 +55,8 @@ class PropertyController extends Controller
         return new PropertyResource($property);
     }
 
-    public function destroy(int $id){
+    public function destroy(int $id)
+    {
         $deleted = $this->propertyService->delete($id);
 
         if (! $deleted) {
