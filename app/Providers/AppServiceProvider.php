@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Providers;
+use App\Services\Contracts\AuthServiceInterface;
+use App\Services\AuthService;
 
 use App\Repositories\Contracts\PropertyRepositoryInterface;
 use App\Repositories\PropertyRepository;
@@ -35,6 +37,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(LocalityServiceInterface::class, LocalityService::class);
         $this->app->bind(UserRepositoryInterface::class, UserRepository::class);
         $this->app->bind(UserServiceInterface::class, UserService::class);
+        $this->app->bind(AuthServiceInterface::class, AuthService::class);
     }
 
     /**

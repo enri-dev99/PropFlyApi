@@ -1,8 +1,9 @@
 <?php
 
 namespace App\Repositories;
+
 use Illuminate\Database\Eloquent\Collection;
-use App\Models\User;    
+use App\Models\User;
 use App\Repositories\Contracts\UserRepositoryInterface;
 
 class UserRepository implements UserRepositoryInterface
@@ -14,7 +15,12 @@ class UserRepository implements UserRepositoryInterface
 
     public function find(int $id): ?User
     {
-        return User::findOrFail($id);
+        return User::find($id);
+    }
+
+    public function findByEmail(string $email): ?User
+    {
+        return User::where('email', $email)->first();
     }
 
     public function create(array $data): User

@@ -4,8 +4,15 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PropertyController;
 use App\Http\Controllers\CityController;
 use App\Http\Controllers\LocalityController;
+use App\Http\Controllers\AuthController;
 
 Route::prefix('v1')->group(function () {
+
+    Route::prefix('auth')->group(function () {
+        Route::post('register', [AuthController::class, 'register']);
+        Route::post('login', [AuthController::class, 'login']);
+    });
+
     Route::prefix('properties')->group(function () {
         Route::get('/', [PropertyController::class, 'index']);
         Route::get('{id}', [PropertyController::class, 'show']);
