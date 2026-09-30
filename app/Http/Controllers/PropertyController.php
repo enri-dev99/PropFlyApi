@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Property;
 use App\Services\Contracts\PropertyServiceInterface;
 use App\Http\Resources\PropertyResource;
 use Illuminate\Http\Request;
 use App\Http\Requests\StorePropertyRequest;
 use App\Http\Requests\UpdatePropertyRequest;
+use Illuminate\Support\Facades\Gate;
 
 class PropertyController extends Controller
 {
@@ -25,43 +27,43 @@ class PropertyController extends Controller
         return PropertyResource::collection($properties);
     }
 
-    public function show(int $id)
+    public function show(Property $property)
     {
-        $property = $this->propertyService->find($id);
-
-        if (!$property) {
-            return response()->json(['message' => 'Property not found'], 404);
-        }
-
         return new PropertyResource($property);
     }
 
     public function store(StorePropertyRequest $request)
     {
-        $property = $this->propertyService->store($request->validated());
+        $property = $this->propertyService->store(
+            $request->validated(), 
+            $request->user()
+        );
+
         $resource = new PropertyResource($property);
 
         return $resource->response()->setStatusCode(201);
     }
 
-    public function update(UpdatePropertyRequest $request, int $id)
+    public function update(UpdatePropertyRequest $request, Property $property)
     {
-        $property = $this->propertyService->update($id, $request->validated());
+      
+        Gate::authorize('update', $property);
 
-        if (!$property) {
-            return response()->json(['message' => 'Property not found'], 404);
-        }
+        $property = $this->propertyService->update(
+            $property->id, 
+            $request->validated()
+        );
 
         return new PropertyResource($property);
     }
 
-    public function destroy(int $id)
+    public function destroy(Property $property)
     {
-        $deleted = $this->propertyService->delete($id);
+       
+        Gate::authorize('delete', $property);
 
-        if (! $deleted) {
-            return response()->json(['message' => 'Property not found'], 404);
-        }
+        $this->propertyService->delete($property->id);
+
 
         return response()->json(['message' => 'Property deleted']);
     }

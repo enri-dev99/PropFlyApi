@@ -2,9 +2,10 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\PropertyOperation;
+use App\Enums\PropertyType;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Validation\Rule;
-use App\Models\Property;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StorePropertyRequest extends FormRequest
@@ -25,30 +26,19 @@ class StorePropertyRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'user_id' => 'required|integer|exists:users,id',
+            'user_id' => 'nullable|integer|exists:users,id',
             'title' => 'required|string|max:255',
             'description' => 'required|string',
             'price' => 'required|numeric',
             'type' => [
                 'required',
                 'integer',
-                Rule::in([
-                    Property::TYPE_APARTMENT,
-                    Property::TYPE_HOUSE,
-                    Property::TYPE_CHALET,
-                    Property::TYPE_LAND,
-                    Property::TYPE_COMMERCIAL,
-                    Property::TYPE_GARAGE,
-                    Property::TYPE_STORAGE,
-                ]),
+                Rule::enum(PropertyType::class),
             ],
             'operation' => [
                 'required',
                 'integer',
-                Rule::in([
-                    Property::OPERATION_SALE,
-                    Property::OPERATION_RENT,
-                ]),
+                Rule::enum(PropertyOperation::class),
             ],
             'bedrooms' => 'nullable|integer|min:0',
             'surface' => 'required|numeric|min:0',

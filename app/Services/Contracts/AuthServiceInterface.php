@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Services\Contracts;
+use App\Models\User;
 
 interface AuthServiceInterface
 {
@@ -8,5 +9,7 @@ interface AuthServiceInterface
     public function register(array $data): array;
 
     public function login(array $data): array;
+
+    public function logout(User $user): void;
     
 }

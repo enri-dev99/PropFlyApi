@@ -4,7 +4,8 @@ namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Validation\Rule;
-use App\Models\Property;
+use App\Enums\PropertyType;
+use App\Enums\PropertyOperation;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdatePropertyRequest extends FormRequest
@@ -32,23 +33,12 @@ class UpdatePropertyRequest extends FormRequest
             'type' => [
                 'sometimes',
                 'integer',
-                Rule::in([
-                    Property::TYPE_APARTMENT,
-                    Property::TYPE_HOUSE,
-                    Property::TYPE_CHALET,
-                    Property::TYPE_LAND,
-                    Property::TYPE_COMMERCIAL,
-                    Property::TYPE_GARAGE,
-                    Property::TYPE_STORAGE,
-                ]),
+                Rule::enum(PropertyType::class),
             ],
             'operation' => [
                 'sometimes',
                 'integer',
-                Rule::in([
-                    Property::OPERATION_SALE,
-                    Property::OPERATION_RENT,
-                ]),
+                Rule::enum(PropertyOperation::class),
             ],
             'bedrooms' => 'nullable|integer|min:0',
             'surface' => 'sometimes|numeric|min:0',

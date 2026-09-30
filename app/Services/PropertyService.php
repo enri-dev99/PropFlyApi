@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Services;
-
+use App\Models\User;
 use App\Models\Property;
 use App\Repositories\Contracts\PropertyRepositoryInterface;
 use App\Services\Contracts\PropertyServiceInterface;
@@ -23,8 +23,13 @@ class PropertyService implements PropertyServiceInterface
         return $this->propertyRepository->find($id);
     }
 
-    public function store(array $data): Property
+    public function store(array $data, User $user): Property
     {
+        
+        if(!$user->isAdmin()){
+            $data['user_id'] = $user->id;
+        }
+
         return $this->propertyRepository->create($data);
     }
 

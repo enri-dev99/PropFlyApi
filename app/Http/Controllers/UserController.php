@@ -2,7 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Models\User;
+use Illuminate\Support\Facades\Gate;
 use App\Http\Resources\UserResource;
 use App\Services\Contracts\UserServiceInterface;
 use App\Http\Requests\StoreUserRequest;
@@ -11,38 +12,35 @@ use App\Http\Requests\UpdateUserRequest;
 class UserController extends Controller
 {
     public function __construct(
-      private UserServiceInterface $userService
-    ){}
+        private UserServiceInterface $userService
+    ) {}
 
     public function index()
     {
+        Gate::authorize('viewAny', User::class);
+            
         $users = $this->userService->list();
 
         return UserResource::collection($users);
     }
 
-    public function store(StoreUserRequest $request)
+    public function show(User $user)
     {
-        $user = $this->userService->create($request->validated());
-
+        Gate::authorize('view', $user);
         return new UserResource($user);
     }
 
-    public function show(int $id)
+    public function update(UpdateUserRequest $request, User $user)
     {
-        $user = $this->userService->find($id);
+        Gate::authorize('update', $user);
+        $user = $this->userService->update($user->id, $request->validated());
         return new UserResource($user);
     }
 
-    public function update(UpdateUserRequest $request, int $id)
+    public function destroy(User $user)
     {
-        $user = $this->userService->update($id, $request->validated());
-        return new UserResource($user);
-    }
-
-    public function destroy(int $id)
-    {
-        $this->userService->delete($id);
+        Gate::authorize('delete', $user);
+        $this->userService->delete($user->id);
         return response()->json([
             'message' => 'User deleted successfully'
         ]);
