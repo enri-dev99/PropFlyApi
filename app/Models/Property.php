@@ -8,11 +8,13 @@ use App\Models\User;
 use App\Models\Locality;
 use App\Enums\PropertyType;
 use App\Enums\PropertyOperation;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 #[Fillable(['user_id', 'title', 'description', 'price', 'type', 'operation', 'bedrooms', 'surface', 'locality_id', 'address', 'postal_code'])]
 
 class Property extends Model
 {
+    use HasFactory;
 
     protected function casts(): array
     {
