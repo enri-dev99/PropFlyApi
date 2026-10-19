@@ -24,6 +24,7 @@ class UpdateCityRequest extends FormRequest
     {
         return [
             'name' => ['sometimes', 'string', 'max:255'],
+            'country_id' => ['sometimes', 'integer', 'exists:countries,id'],
         ];
     }
 }

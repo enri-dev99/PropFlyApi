@@ -21,7 +21,7 @@ class CityController extends Controller
     public function show(int $id){
         $city = $this->cityService->find($id);
 
-        if(! $city)
+        if(!$city)
             return response()->json(['message' => 'City not found'], 404);
 
         return response()->json($city);

@@ -21,6 +21,10 @@ use \App\Repositories\Contracts\LocalityRepositoryInterface;
 use \App\Repositories\LocalityRepository;
 use \App\Services\Contracts\LocalityServiceInterface;
 use \App\Services\LocalityService;
+use \App\Repositories\Contracts\CountryRepositoryInterface;
+use \App\Repositories\CountryRepository;
+use \App\Services\Contracts\CountryServiceInterface;
+use \App\Services\CountryService;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -35,6 +39,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(CityServiceInterface::class, CityService::class);
         $this->app->bind(LocalityRepositoryInterface::class, LocalityRepository::class);
         $this->app->bind(LocalityServiceInterface::class, LocalityService::class);
+        $this->app->bind(CountryRepositoryInterface::class, CountryRepository::class);
+        $this->app->bind(CountryServiceInterface::class, CountryService::class);
         $this->app->bind(UserRepositoryInterface::class, UserRepository::class);
         $this->app->bind(UserServiceInterface::class, UserService::class);
         $this->app->bind(AuthServiceInterface::class, AuthService::class);
