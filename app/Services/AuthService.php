@@ -2,7 +2,7 @@
 
 namespace App\Services;
 use App\Services\Contracts\AuthServiceInterface;
-use InvalidArgumentException;
+use Illuminate\Auth\AuthenticationException;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use App\Repositories\Contracts\UserRepositoryInterface;
@@ -34,7 +34,7 @@ class AuthService implements AuthServiceInterface
     {
         $user = $this->userRepository->findByEmail($data['email']);
         if (!$user || !Hash::check($data['password'], $user->password)) {
-            throw new InvalidArgumentException('Invalid credentials');
+            throw new AuthenticationException('Invalid credentials');
         }
 
         $token = $user->createToken('auth_token')->plainTextToken;
