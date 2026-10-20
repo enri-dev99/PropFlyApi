@@ -28,6 +28,10 @@ class PropertyService implements PropertyServiceInterface
         
         if(!$user->isAdmin()){
             $data['user_id'] = $user->id;
+        }else{
+            if(!isset($data['user_id'])){
+                $data['user_id'] = $user->id;
+            }
         }
 
         return $this->propertyRepository->create($data);

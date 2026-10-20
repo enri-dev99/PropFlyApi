@@ -29,7 +29,7 @@ class UpdatePropertyRequest extends FormRequest
             'user_id' => 'sometimes|integer|exists:users,id',
             'title' => 'sometimes|string|max:255',
             'description' => 'sometimes|string',
-            'price' => 'sometimes|numeric',
+            'price' => 'sometimes|numeric|min:0|max:99999999.99|decimal:0,2',
             'type' => [
                 'sometimes',
                 'integer',

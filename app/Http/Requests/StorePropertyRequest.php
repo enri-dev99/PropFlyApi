@@ -29,7 +29,7 @@ class StorePropertyRequest extends FormRequest
             'user_id' => 'nullable|integer|exists:users,id',
             'title' => 'required|string|max:255',
             'description' => 'required|string',
-            'price' => 'required|numeric',
+            'price' => 'required|numeric|min:0|max:99999999.99|decimal:0,2',
             'type' => [
                 'required',
                 'integer',

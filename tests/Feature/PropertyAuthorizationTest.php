@@ -12,7 +12,7 @@ class PropertyAuthorizationTest extends TestCase
 {
     // Reinicia la base de datos entre pruebas para mantenerlas aisladas.
     use RefreshDatabase;
-  
+
     // Comprueba que un usuario autenticado puede consultar el listado.
     public function test_authenticated_user_can_list_properties(): void
     {
@@ -31,7 +31,7 @@ class PropertyAuthorizationTest extends TestCase
     // Verifica que el listado devuelve el título guardado para una propiedad.
     public function test_property_title(): void
     {
-        
+
         $user = User::factory()->create();
         Property::factory()->create([
             'title' => 'Piso en Madrid',
@@ -87,7 +87,6 @@ class PropertyAuthorizationTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertJsonPath('data.title', 'Updated Title');
-
     }
 
     public  function test_admin_can_update_another_users_property(): void
@@ -139,7 +138,7 @@ class PropertyAuthorizationTest extends TestCase
 
     public function test_admin_can_delete_another_users_property(): void
     {
-        
+
         $admin = User::factory()->create([
             'role' => UserRole::ADMIN,
         ]);
@@ -155,6 +154,144 @@ class PropertyAuthorizationTest extends TestCase
 
         $this->assertDatabaseMissing('properties', [
             'id' => $property->id,
+        ]);
+    }
+    public function test_guest_cannot_create_property(): void
+    {
+        $response = $this->postJson("/api/v1/properties", [
+            'title' => 'Guest Property',
+        ]);
+
+        $response->assertStatus(401);
+    }
+    public function test_authenticated_user_can_create_property(): void
+    {
+        $user = User::factory()->create();
+
+        $existingProperty = Property::factory()->create();
+
+        $response = $this->actingAs($user)->postJson(
+            '/api/v1/properties',
+            [
+                'title' => 'Piso de prueba',
+                'description' => 'Piso luminoso para realizar tests.',
+                'price' => 180000,
+                'type' => 0,
+                'operation' => 0,
+                'bedrooms' => 2,
+                'bathrooms' => 1,
+                'surface' => 75,
+                'locality_id' => $existingProperty->locality_id,
+                'address' => 'Calle de prueba 10',
+                'postal_code' => '28001',
+            ]
+        );
+
+        $response->assertSuccessful();
+
+        $this->assertDatabaseHas('properties', [
+            'title' => 'Piso de prueba',
+            'price' => 180000,
+            'user_id' => $user->id,
+        ]);
+    }
+
+    public function test_property_is_assigned_to_authenticated_user(): void
+    {
+        $user = User::factory()->create();
+        $anotherUser = User::factory()->create();
+
+        $existingProperty = Property::factory()->create();
+
+        $response = $this->actingAs($user)->postJson(
+            '/api/v1/properties',
+            [
+                'title' => 'Propiedad con propietario correcto',
+                'description' => 'Test de asignación de propietario.',
+                'price' => 200000,
+                'type' => 0,
+                'operation' => 0,
+                'bedrooms' => 3,
+                'bathrooms' => 2,
+                'surface' => 90,
+                'locality_id' => $existingProperty->locality_id,
+                'address' => 'Calle de prueba 20',
+                'postal_code' => '28002',
+                'user_id' => $anotherUser->id,
+            ]
+        );
+
+        $response->assertSuccessful();
+
+        $this->assertDatabaseHas('properties', [
+            'title' => 'Propiedad con propietario correcto',
+            'user_id' => $user->id,
+        ]);
+
+        $this->assertDatabaseMissing('properties', [
+            'title' => 'Propiedad con propietario correcto',
+            'user_id' => $anotherUser->id,
+        ]);
+    }
+
+    public function test_user_cannot_view_nonexistent_property(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)
+            ->getJson('/api/v1/properties/9999999999999');
+
+        $response->assertNotFound();
+    }
+
+    public function test_user_cannot_update_nonexistent_property(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->putJson(
+            '/api/v1/properties/9999999999999',
+            ['title' => 'Título actualizado']
+        );
+
+        $response->assertNotFound();
+    }
+    public function test_user_cannot_delete_nonexistent_property(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)
+            ->deleteJson('/api/v1/properties/9999999999999');
+
+        $response->assertNotFound();
+    }
+
+    public function test_property_creation_fails_with_negative_price(): void
+    {
+        $user = User::factory()->create();
+
+        $existingProperty = Property::factory()->create();
+
+        $response = $this->actingAs($user)->postJson(
+            '/api/v1/properties',
+            [
+                'title' => 'Propiedad inválida',
+                'description' => 'Test de validación.',
+                'price' => -100,
+                'type' => 0,
+                'operation' => 0,
+                'bedrooms' => 2,
+                'bathrooms' => 1,
+                'surface' => 75,
+                'locality_id' => $existingProperty->locality_id,
+                'address' => 'Calle de prueba 10',
+                'postal_code' => '28001',
+            ]
+        );
+
+        $response->assertUnprocessable();
+
+        $this->assertDatabaseMissing('properties', [
+            'title' => 'Propiedad inválida',
         ]);
     }
 }
