@@ -12,29 +12,42 @@ class PropertyRepository implements PropertyRepositoryInterface
     {
         $query = Property::with(['locality.city']);
 
-        if(isset($filters['type'])){
+        if (isset($filters['type'])) {
             $query->where('type', $filters['type']);
         }
-        if(isset($filters['operation'])){
+        if (isset($filters['operation'])) {
             $query->where('operation', $filters['operation']);
         }
-        if(isset($filters['min_price'])){
+        if (isset($filters['min_price'])) {
             $query->where('price', '>=', $filters['min_price']);
         }
-        if(isset($filters['max_price'])){
+        if (isset($filters['max_price'])) {
             $query->where('price', '<=', $filters['max_price']);
         }
-        if(isset($filters['locality_id'])){
+        if (isset($filters['locality_id'])) {
             $query->where('locality_id', $filters['locality_id']);
         }
-        if(isset($filters['city_id'])){
-            $query->whereHas('locality', function ($query) use ($filters){
+        if (isset($filters['city_id'])) {
+            $query->whereHas('locality', function ($query) use ($filters) {
                 $query->where('city_id', $filters['city_id']);
             });
         }
 
-        return $query->paginate($perPage);
+        $sortBy = $filters['sort_by'] ?? 'created_at';
+        $sortDirection = strtolower($filters['sort_direction'] ?? 'desc');
 
+      
+        if (!in_array($sortBy, ['price', 'created_at'], true)) {
+            $sortBy = 'created_at';
+        }
+
+     
+        if (!in_array($sortDirection, ['asc', 'desc'], true)) {
+            $sortDirection = 'desc';
+        }
+
+
+        return $query->orderBy($sortBy, $sortDirection)->paginate($perPage);
     }
 
     public function find(int $id): ?Property
