@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use App\Http\Requests\PropertyIndexRequest;
 use App\Models\Property;
 use App\Services\Contracts\PropertyServiceInterface;
 use App\Http\Resources\PropertyResource;
@@ -16,9 +16,9 @@ class PropertyController extends Controller
         protected PropertyServiceInterface $propertyService
     ) {}
 
-    public function index(Request $request)
+    public function index(PropertyIndexRequest $request)
     {
-        $filters = $request->only(['type', 'operation', 'min_price', 'max_price', 'locality_id', 'city_id', 'sort_by', 'sort_direction']);
+        $filters = $request->only(['type', 'operation', 'min_price', 'max_price', 'locality_id', 'city_id', 'sort_by', 'sort_direction', 'per_page']);
         $perPage = min(
             $request->integer('per_page', 15),
             50
