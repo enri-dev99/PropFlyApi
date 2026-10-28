@@ -3,10 +3,11 @@
 namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 use App\Models\User;
+use App\Enums\UserRole;
 use Illuminate\Support\Facades\Hash;
+
 class AuthTest extends TestCase
 {
     use RefreshDatabase;
@@ -87,7 +88,7 @@ class AuthTest extends TestCase
         $response->assertUnauthorized();
     }
 
-    
+
     public function test_user_can_logout(): void
     {
         $user = User::factory()->create();
@@ -109,12 +110,34 @@ class AuthTest extends TestCase
         $user = User::factory()->create();
         $token = $user->createToken('test-token')->plainTextToken;
 
-  
+
         $user->tokens()->delete();
 
         $response = $this->withHeader('Authorization', 'Bearer ' . $token)
             ->postJson('/api/v1/auth/logout');
 
         $response->assertUnauthorized();
+    }
+    public function test_admin_can_change_a_user_role(): void
+    {
+        $admin = User::factory()->create([
+            'role' => UserRole::ADMIN,
+        ]);
+
+        $user = User::factory()->create([
+            'role' => UserRole::USER,
+        ]);
+
+        $response = $this->actingAs($admin)->patchJson(
+            "/api/v1/users/{$user->id}/role",
+            ['role' => UserRole::ADMIN]
+        );
+
+        $response->assertOk();
+
+        $this->assertDatabaseHas('users', [
+            'id' => $user->id,
+            'role' => UserRole::ADMIN,
+        ]);
     }
 }

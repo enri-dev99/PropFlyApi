@@ -36,4 +36,9 @@ class UserService implements UserServiceInterface
     {
         return $this->userRepository->delete($id);
     }
+
+    public function updateRole(int $id, string $role): ?User    
+    {
+        return $this->userRepository->updateRole($id, $role);
+    }
 }

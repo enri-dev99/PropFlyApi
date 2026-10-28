@@ -6,8 +6,8 @@ use App\Models\User;
 use Illuminate\Support\Facades\Gate;
 use App\Http\Resources\UserResource;
 use App\Services\Contracts\UserServiceInterface;
-use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
+use App\Http\Requests\UpdateUserRoleRequest;
 
 class UserController extends Controller
 {
@@ -44,5 +44,11 @@ class UserController extends Controller
         return response()->json([
             'message' => 'User deleted successfully'
         ]);
+    }
+    public function updateRole(UpdateUserRoleRequest $request, User $user)
+    {
+        Gate::authorize('updateRole', $user);
+        $user = $this->userService->updateRole($user->id, $request->validated('role'));
+        return new UserResource($user);
     }
 }

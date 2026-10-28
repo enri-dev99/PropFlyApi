@@ -17,4 +17,6 @@ interface UserRepositoryInterface
     public function update(int $id, array $data): ?User;
 
     public function delete(int $id): bool;
+
+    public function updateRole(int $id, string $role): ?User;
 }

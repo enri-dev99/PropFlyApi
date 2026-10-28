@@ -46,4 +46,15 @@ class UserRepository implements UserRepositoryInterface
         }
         return (bool)$user->delete();
     }
+
+    public function updateRole(int $id, string $role): ?User
+    {
+        $user = User::find($id);
+        if (!$user) {
+            return null;
+        }
+        $user->role = $role;
+        $user->save();
+        return $user;
+    }
 }
