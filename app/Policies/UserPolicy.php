@@ -16,7 +16,7 @@ class UserPolicy
      */
     public function view(User $user, User $model): bool
     {
-        return $user->isAdmin() || $user->id === $model->id;
+        return $user->isAdmin() || !$model->isAdmin();
     }
 
 

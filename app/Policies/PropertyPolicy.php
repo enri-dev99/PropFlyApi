@@ -8,6 +8,10 @@ use Illuminate\Auth\Access\Response;
 
 class PropertyPolicy
 {
+
+    public function create(User $user){
+        return !$user->isAdmin();
+    }
     
     public function update(User $user, Property $property): bool
     {

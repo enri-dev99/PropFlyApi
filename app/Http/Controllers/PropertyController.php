@@ -34,6 +34,8 @@ class PropertyController extends Controller
 
     public function store(StorePropertyRequest $request)
     {
+        Gate::authorize('create', Property::class);
+        
         $property = $this->propertyService->store(
             $request->validated(), 
             $request->user()

@@ -26,7 +26,7 @@ class UpdatePropertyRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'user_id' => 'sometimes|integer|exists:users,id',
+            'user_id' => ['prohibited'],
             'title' => 'sometimes|string|max:255',
             'description' => 'sometimes|string',
             'price' => 'sometimes|numeric|min:0|max:99999999.99|decimal:0,2',
