@@ -3,15 +3,42 @@
 namespace Tests\Feature;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use App\Models\Locality;
 use Tests\TestCase;
-use App\Models\Property;
+use App\Http\Resources\PropertyResource;
+use App\Enums\PropertyType;
+use App\Enums\PropertyOperation;
 use App\Models\User;
 use App\Enums\UserRole;
+use App\Models\Property;
 
 class PropertyAuthorizationTest extends TestCase
 {
     // Reinicia la base de datos entre pruebas para mantenerlas aisladas.
     use RefreshDatabase;
+    public function test_admin_cannot_create_property(): void
+    {
+        $admin = User::factory()->create([
+            'role' => UserRole::ADMIN,
+        ]);
+        $locality = Locality::factory()->create();
+        $this->actingAs($admin, 'sanctum')
+            ->postJson('/api/v1/properties', [
+                'title' => 'Test Property',
+                'description' => 'Test Description',
+                'price' => 100000,
+                'type' => PropertyType::HOUSE,
+                'operation' => PropertyOperation::RENT,
+                'bedrooms' => 2,
+                'surface' => 100,
+                'locality_id' => $locality->id,
+                'address' => 'Test Address',
+                'postal_code' => '12345'    
+            ])
+            ->assertForbidden();
+
+        $this->assertDatabaseCount('properties', 0);
+    }
 
     // Comprueba que un usuario autenticado puede consultar el listado.
     public function test_authenticated_user_can_list_properties(): void
@@ -176,8 +203,8 @@ class PropertyAuthorizationTest extends TestCase
                 'title' => 'Piso de prueba',
                 'description' => 'Piso luminoso para realizar tests.',
                 'price' => 180000,
-                'type' => 0,
-                'operation' => 0,
+                'type' => PropertyType::APARTMENT,
+                'operation' => PropertyOperation::SALE,
                 'bedrooms' => 2,
                 'bathrooms' => 1,
                 'surface' => 75,
@@ -209,8 +236,8 @@ class PropertyAuthorizationTest extends TestCase
                 'title' => 'Propiedad con propietario correcto',
                 'description' => 'Test de asignación de propietario.',
                 'price' => 200000,
-                'type' => 0,
-                'operation' => 0,
+                'type' => PropertyType::APARTMENT,
+                'operation' => PropertyOperation::SALE,
                 'bedrooms' => 3,
                 'bathrooms' => 2,
                 'surface' => 90,
@@ -277,8 +304,8 @@ class PropertyAuthorizationTest extends TestCase
                 'title' => 'Propiedad inválida',
                 'description' => 'Test de validación.',
                 'price' => -100,
-                'type' => 0,
-                'operation' => 0,
+                'type' => PropertyType::APARTMENT,
+                'operation' => PropertyOperation::SALE,
                 'bedrooms' => 2,
                 'bathrooms' => 1,
                 'surface' => 75,
